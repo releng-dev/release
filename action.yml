@@ -22,6 +22,13 @@ inputs:
       version. Approval follows the destination, so a renamed or new job can't skip it, and
       letting more people approve, or none, applies only once a current approver accepts it.
     required: false
+  without-approval:
+    description: >-
+      For a website: files, as GitHub's filter patterns from the site's root (blog/**), that may
+      change without asking the approvers. If every file that changed since the version at this
+      stop is listed, it ships without asking. Listing more applies only once a current approver
+      accepts it.
+    required: false
   rollout:
     description: >-
       The share offered a new version at first, where the destination can roll out: a
@@ -47,6 +54,11 @@ inputs:
     required: false
   site:
     description: For cloudflare and vercel, the site's address, such as example.com.
+    required: false
+  account:
+    description: >-
+      For cloudflare and cloudflare-preview, when the team has several Cloudflare accounts: the
+      account ID, written out. Releng.dev reads it from this file, so an expression can't fill it.
     required: false
   project:
     description: >-
