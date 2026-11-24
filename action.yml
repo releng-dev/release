@@ -47,8 +47,15 @@ inputs:
       Jobs of a workflow on deployment_status that run after this stop ships, by id or name,
       separated by commas. Until each passes for a version, its rollout here doesn't move on and
       the stops after this one don't take it. One that fails holds it where it is and tells this
-      stop's approvers.
+      stop's approvers, unless guard-fails says to go back.
     required: false
+  guard-fails:
+    description: >-
+      What happens when a guard fails: hold keeps the version where it is for a person to decide;
+      back goes back to the version before at once, as Go back does, where the destination can go
+      back by itself (cloudflare, vercel, download-page). Either way this stop's approvers hear.
+    required: false
+    default: hold
   channel:
     description: The update feed's channel, such as beta or nightly. Leave it out for the default channel.
     required: false
