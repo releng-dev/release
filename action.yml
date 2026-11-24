@@ -1,0 +1,69 @@
+name: Releng.dev release
+description: >-
+  Hands this commit's build to Releng.dev for one stop, then ends. Releng.dev ships it once the
+  jobs this one needs have shipped and, when the job lists approvers, one of them approves it, and once the team's policies are met.
+  Jobs that need this one run when it hands over, not when it ships; to run something after a
+  stop ships, use a workflow on deployment_status.
+inputs:
+  to:
+    description: >-
+      Where it ships, one destination per job: update-feed, download-page, testflight,
+      play-testing, app-store, google-play, cloudflare-preview, cloudflare, vercel-preview, vercel,
+      steam-playtest or steam.
+    required: true
+  stop:
+    description: >-
+      The stop this job belongs to, when several jobs share one approval, such as an App Store
+      job and a Google Play job. Defaults to the job's id.
+    required: false
+  approvers:
+    description: >-
+      GitHub usernames or teams (@org/team), separated by commas. One of them approves each
+      version. Approval follows the destination, so a renamed or new job can't skip it, and
+      letting more people approve, or none, applies only once a current approver accepts it.
+    required: false
+  rollout:
+    description: >-
+      The share offered a new version at first, where the destination can roll out: a
+      percentage for update-feed and google-play, a share of requests for cloudflare, or "phased"
+      for Apple's 7-day phased release. List several, such as "10%, 50%, 100%", for the shares it
+      moves through.
+    required: false
+    default: 100%
+  every:
+    description: >-
+      With several shares in rollout, how long each is offered before Releng.dev moves it on to
+      the next, such as 6h or 1d. Leave it out to move it on by hand.
+    required: false
+  guard:
+    description: >-
+      Jobs of a workflow on deployment_status that run after this stop ships, by id or name,
+      separated by commas. Until each passes for a version, its rollout here doesn't move on and
+      the stops after this one don't take it. One that fails holds it where it is and tells this
+      stop's approvers.
+    required: false
+  channel:
+    description: The update feed's channel, such as beta or nightly. Leave it out for the default channel.
+    required: false
+  site:
+    description: For cloudflare and vercel, the site's address, such as example.com.
+    required: false
+  project:
+    description: >-
+      For vercel and vercel-preview, the Vercel project's id: the same VERCEL_PROJECT_ID secret
+      the build's `vercel pull` uses, so the build and the deployment can't name different
+      projects.
+    required: false
+  server:
+    description: >-
+      A team's own Releng.dev server, such as https://releng.example.com. Leave it out for hosted
+      Releng.dev. The environment variable RELENG_URL wins over it.
+    required: false
+outputs:
+  deployment:
+    description: The GitHub deployment Releng.dev created for this stop, once it has one.
+  status:
+    description: What Releng.dev answered, such as queued or waiting.
+runs:
+  using: node24
+  main: dist/index.js
